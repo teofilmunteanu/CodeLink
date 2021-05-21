@@ -5,4 +5,5 @@ Tehnologii:
   node.js-express
          -socket.io
          -peer.js
-  django
+  django-django channels
+        -code mirror
