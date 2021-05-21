@@ -4,14 +4,15 @@
 <head>
     <meta charset="utf-8"/>
     <title>Room</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.52.2/codemirror.min.css"></link>
     <link rel="stylesheet"  href="{%  static  'css/room.css'  %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.52.2/codemirror.min.css"></link>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.52.2/codemirror.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.52.2/mode/javascript/javascript.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.52.2/theme/material-darker.min.css">
 </head>
 <body>
-    <textarea id="work-field"></textarea>
+    <textarea id="work-field" class = "center"></textarea>
+    <input type="button" value="Save" onclick="save()"></input>
 
     {{ room_name|json_script:"room-name" }}
     
@@ -26,11 +27,6 @@
             styleSelectedText: true,
             mode: 'javascript',
             theme: 'material-darker',
-            /*extraKeys: {
-                "Enter": function(cm) {
-                    test(cm); //function called at 'enter'
-                }
-            }*/
         });
 
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
@@ -49,7 +45,7 @@
         
         editor.focus();
 
-        roomSocket.onmessage = function(e) {
+        roomSocket.onmessage = (e) => {
             const data = JSON.parse(e.data);
             detectChange = false;
             cursorPos = editor.getCursor();
@@ -58,7 +54,7 @@
             detectChange = true;
         };
 
-        roomSocket.onclose = function(e) {
+        roomSocket.onclose = (e) => {
             console.error('Web socket closed');
         };
 
@@ -70,24 +66,25 @@
                 }));  
             }   
         }); 
+
+        let save = () => {
+            let data = editor.getValue();
+
+            const textAsBLOB = new Blob([data], { type: 'text/plain' });
+            const FileName = 'code.js';
+            let downloadLink = document.createElement("a");
+            downloadLink.download = FileName;
+
+            if (window.webkitURL) {
+                downloadLink.href = window.webkitURL.createObjectURL(textAsBLOB);
+            }
+            else {
+                downloadLink.href = window.URL.createObjectURL(textAsBLOB);
+            }
+
+            downloadLink.click(); 
+        }
         
-        editor.on("keyup", function (cm, event) {
-            var keycode = event.which;
-            currentLine = editor.getCursor().line + 1;
-            console.log("key", keycode,currentLine);
-            //editor.markText({line: currentLine, ch: 1}, {line: 1, ch: 42}, {className: "styled-background"});
-        });
-
-        editor.on("mousedown", function (cm, event) {
-            var keycode = event.which;
-            currentLine = editor.getCursor().line + 1;
-            console.log("mouseclick", keycode, editor.getLine(currentLine - 1).length);
-        });
-
-        editor.on("cursorActivity", function (cm, event) {
-            console.log("CURSOR CHANGED");
-        });
-
     </script>
 </body>
 </html>
