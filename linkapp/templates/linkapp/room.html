@@ -3,19 +3,33 @@
 <head>
     <meta charset="utf-8"/>
     <title>Room</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.52.2/codemirror.min.css"></link>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.52.2/codemirror.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.52.2/mode/javascript/javascript.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.52.2/theme/material-darker.min.css">
 </head>
 <body>
-    <textarea id="work-field" cols="100" rows="20"></textarea><br>
+    <textarea id="work-field"></textarea>
+
     {{ room_name|json_script:"room-name" }}
-    <script>
-
     
-
+    <script>
+        myTextarea = document.getElementById('work-field');
+       
+        var editor = CodeMirror.fromTextArea(myTextarea, {
+            lineNumbers: true,
+            indentUnit: 4,
+            inputStyle: 'contenteditable',
+            matchBrackets: true,
+            mode: 'javascript',
+            theme: 'material-darker'
+        });
 
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
 
         window.open(`http://localhost:3000/chat/${roomName}?name=${roomName}`, '_blank', 'toolbar=0,location=0,menubar=0');
-
+        
         const roomSocket = new WebSocket(
             'ws://'
             + window.location.host
@@ -24,24 +38,32 @@
             + '/'
         );
 
+        var detectChange = true;
+        
+        editor.focus();
+
         roomSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            document.querySelector('#work-field').value = (data.source_code);
+            detectChange = false;
+            cursorPos = editor.getCursor();
+            editor.setValue(data.source_code);
+            editor.setCursor(cursorPos);
+            detectChange = true;
         };
 
         roomSocket.onclose = function(e) {
             console.error('Web socket closed');
         };
 
-        document.querySelector('#work-field').focus();
+        editor.on('change', editor => {
+            if(detectChange){
+                const source_code = editor.getValue();  
+                roomSocket.send(JSON.stringify({
+                    'source_code': source_code
+                }));  
+            }   
+        }); 
 
-        document.querySelector('#work-field').oninput = function(e) {
-            const InputDom = document.querySelector('#work-field');
-            const source_code = InputDom.value;
-            roomSocket.send(JSON.stringify({
-                'source_code': source_code
-            }));
-        };
     </script>
 </body>
 </html>
