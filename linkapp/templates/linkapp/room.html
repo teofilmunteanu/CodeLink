@@ -6,10 +6,15 @@
 </head>
 <body>
     <textarea id="work-field" cols="100" rows="20"></textarea><br>
-
     {{ room_name|json_script:"room-name" }}
     <script>
+
+    
+
+
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+        window.open(`http://localhost:3000/chat/${roomName}?name=${roomName}`, '_blank', 'toolbar=0,location=0,menubar=0');
 
         const roomSocket = new WebSocket(
             'ws://'
