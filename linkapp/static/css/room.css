@@ -1,0 +1,15 @@
+.CodeMirror {
+    border: 5px solid rgb(116, 130, 151); 
+}
+
+.CodeMirror-selected  { 
+    background-color: rgb(186, 186, 219); 
+}
+
+.CodeMirror-selectedtext { 
+    color: white; 
+}
+
+.styled-background { 
+    background-color: rgb(27, 148, 218); 
+}
