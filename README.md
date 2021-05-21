@@ -6,4 +6,5 @@ Tehnologii:
          -socket.io
          -peer.js
   django-django channels
-        -code mirror
+  SQLITE
+  code mirror
