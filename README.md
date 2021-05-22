@@ -19,7 +19,7 @@ Technologies:
   pip install channels
   pip install asgiref
 
-  cd catre webChat directory
+  cd into webChat directory
   npm i express --save
   npm i socket.io --save
   npm i -g nodemon
@@ -27,6 +27,8 @@ Technologies:
   nodemon nodeserver.js
 
   cd into root directory of project
+  py manage.py makemigrations
+  py manage.py migrate
   py manage.py runserver
 
-  mergeti la localhost:8000/room
+  Go to localhost:8000/room (enable pop-ups) 
